@@ -34,7 +34,7 @@ MyDocument.getInitialProps = async (ctx) => {
   const originalRenderPage = ctx.renderPage;
 
   const cache = getCache();
-  const { extractCriticalToChunks } = createEmotionServer(cache);
+  const { extractCriticalToChunks, extractCritical } = createEmotionServer(cache);
 
   ctx.renderPage = () =>
     originalRenderPage({
@@ -48,8 +48,8 @@ MyDocument.getInitialProps = async (ctx) => {
     });
 
   const initialProps = await Document.getInitialProps(ctx);
-  const emotionStyles = extractCriticalToChunks(initialProps.html);
-  const emotionStyleTags = emotionStyles.styles.map((style) => (
+  const emotionStyledStyles = extractCriticalToChunks(initialProps.html);
+  const emotionStyleTags = emotionStyledStyles.styles.map((style) => (
     <style
       data-emotion={`${style.key} ${style.ids.join(' ')}`}
       key={style.key}
@@ -58,12 +58,17 @@ MyDocument.getInitialProps = async (ctx) => {
     />
   ));
 
+  let { css, ids } = extractCritical(initialProps.html);
+  const dataEmtion = `css ${ids.join(' ')}`;
+  const emotionCssStyleTag = <style key="emotion-css-style-tag" data-emotion={dataEmtion}>{css}</style>
+
   return {
     ...initialProps,
     userLanguage: ctx.query.userLanguage || 'en',
     // Styles fragment is rendered after the app and page rendering finish.
     styles: [
       ...emotionStyleTags,
+      emotionCssStyleTag,
     ],
   };
 };
