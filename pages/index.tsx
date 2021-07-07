@@ -1,9 +1,12 @@
 import React from 'react';
 import Stack from '@material-ui/core/Stack';
 import { styled, useTheme } from '@material-ui/core';
-import { createUseClassNamesFactory } from 'tss-react';
+// This is the css util exported in @emotion/react
+import { css } from '@material-ui/system';
+import { createUseClassNamesFactory } from 'tss-react/createUseClassNamesFactory';
 
-const { createUseClassNames } = createUseClassNamesFactory({ useTheme });
+// @ts-ignore Fix me, typings are off
+const { createUseClassNames } = createUseClassNamesFactory({ useTheme, css });
 
 const Div = styled('div')({
   border: "1px solid transparent",
@@ -36,7 +39,8 @@ export default function Home() {
   return (
     <Stack direction="row" spacing={2} alignItems="center" justifyContent="center">
       <Div>This div should have green background</Div>
-      <Div className={classNames.root}>This div should have red background</Div>
+      {/* @ts-ignore We should NOT use the `css` prop here. Not sure there are other options...  */}
+      <Div css={classNames.root}>This div should have red background</Div>
     </Stack>
   )
 }
